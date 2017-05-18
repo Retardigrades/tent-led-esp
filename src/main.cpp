@@ -11,30 +11,26 @@
 
 #include <FastLED.h>
 
+#include "config.h"
 #include "update.h"
 
 FASTLED_USING_NAMESPACE
 
 #define LED_TYPE WS2812B
 #define COLOR_ORDER GRB
-#define STRIPS 5
-#define LED_PER_STRIP 20
 #define NUM_LEDS STRIPS *LED_PER_STRIP
 CRGB leds[NUM_LEDS];
-
-#define BRIGHTNESS 96
-#define FRAMES_PER_SECOND 50
 
 void setup() {
   // disable sleep mode for better data rate
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
 
-  WiFi.begin("xxx", "yyy");
+  WiFi.begin(WIFI_SSID, WIFI_PASSWD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
   }
 
-  UPDATE("brettchen", 6655, "/led_fw");
+  UPDATE(CONTROLLER, UPDATE_PORT, UPDATE_EP);
 
   // tell FastLED about the LED strip configuration
   FastLED.addLeds<WS2811_PORTA, 5>(leds, 20).setCorrection(TypicalLEDStrip);
@@ -54,7 +50,7 @@ void loop() {
   WiFi.setSleepMode(WIFI_NONE_SLEEP);
 
   // insert a delay to keep the framerate modest
-  FastLED.delay(1000 / FRAMES_PER_SECOND);
+  FastLED.delay(1000 / 50);
 
   FastLED.show();
 }
