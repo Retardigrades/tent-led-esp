@@ -34,12 +34,6 @@ void setup() {
     delay(500);
   }
 
-  WiFiUDP Udp;
-
-  Udp.beginPacket("brettchen", 7777);
-  Udp.write("Restarted\n");
-  Udp.endPacket();
-
   UPDATE("brettchen", 6655, "/led_fw");
 
   // tell FastLED about the LED strip configuration
