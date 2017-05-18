@@ -1,0 +1,7 @@
+[submodule "lib/Syslog"]
+	path = lib/Syslog
+	url = https://github.com/arcao/Syslog.git
+[submodule "lib/FastLED"]
+	path = lib/FastLED
+	url = https://github.com/janLo/FastLED.git
+	branch = esp-6-channel
