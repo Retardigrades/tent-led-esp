@@ -14,3 +14,4 @@
 #define BRIGHTNESS 90
 #define STRIPS 5
 #define LED_PER_STRIP 20
+#define FRAME_RATE 30
