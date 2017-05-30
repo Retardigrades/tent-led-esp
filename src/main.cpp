@@ -84,6 +84,14 @@ void netSetup() {
 }
 
 void init_leds() {
+  // Set GPIO15 to pullup
+  pinMode(5, OUTPUT);
+  digitalWrite(5, LOW);
+
+#ifdef DEBUG
+  Serial.println("Set LED");
+#endif
+
   // tell FastLED about the LED strip configuration
   FastLED.addLeds<WS2811_PORTA, STRIPS>(data.leds, LED_PER_STRIP)
       .setCorrection(TypicalLEDStrip);
