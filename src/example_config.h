@@ -15,3 +15,7 @@
 #define STRIPS 5
 #define LED_PER_STRIP 20
 #define FRAME_RATE 30
+
+#define FIST_PACKET_SIZE 800
+
+// #define DEBUG

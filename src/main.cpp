@@ -156,7 +156,15 @@ void check_control() {
 bool check_server(unsigned long loop_time) {
   size_t packetSize = udpServer.parsePacket();
   if (0 == packetSize) {
-    delay(3);
+    // delay(3);
+    return false;
+  }
+
+  if (FIST_PACKET_SIZE > packetSize) {
+    syslog.logf(
+        LOG_DEBUG,
+        "Drop packet because first packet smaler than %d bytes (was %d)",
+        FIST_PACKET_SIZE, packetSize);
     return false;
   }
 
@@ -166,14 +174,14 @@ bool check_server(unsigned long loop_time) {
     while (packetSize <= 0) {
       packetSize = udpServer.parsePacket();
       if (packetSize == 0) {
-	if (millis() - loop_time > (FRAME_TIME / 3)) {
-	  syslog.logf(LOG_DEBUG,
-		      "Did not get %d bytes in "
-		      "time, drop frame...",
-		      BUFSIZE - read);
-	  return false;
-	}
-	delay(1);
+        if (millis() - loop_time > (FRAME_TIME / 3)) {
+          syslog.logf(LOG_DEBUG,
+                      "Did not get %d bytes in "
+                      "time, drop frame...",
+                      BUFSIZE - read);
+          return false;
+        }
+        delay(1);
       }
     }
 
