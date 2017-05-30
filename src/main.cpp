@@ -22,6 +22,12 @@ FASTLED_USING_NAMESPACE
 #define FRAME_TIME 1000 / FRAME_RATE
 #define COUNT_FRAMES_TO 10000
 
+#ifdef DEBUG
+#define BUILD_TYPE "DEBUG"
+#else
+#define BUILD_TYPE "NON-DEBUG"
+#endif
+
 // Data of the led
 union {
   struct {
@@ -125,7 +131,8 @@ void setup() {
 
   netSetup();
 
-  syslog.log(LOG_INFO, "Controller was (re)booted - check for updates");
+  syslog.log(LOG_INFO, "Controller was (re)booted FW: " __DATE__ " :: " __TIME__
+                       " :: " BUILD_TYPE " ... check for updates");
 
   UPDATE(CONTROLLER, UPDATE_PORT, UPDATE_EP);
 
