@@ -145,18 +145,18 @@ void check_control() {
 
     switch (command) {
       case 0x01:
-	syslog.log(LOG_CRIT, "Reboot controller");
-	delay(50);
-	ESP.restart();
-	break;
+        syslog.log(LOG_CRIT, "Reboot controller");
+        delay(50);
+        ESP.restart();
+        break;
       case 0x02:
-	if (packetSize > 1) {
-	  unsigned char brightness = udpControl.read();
-	  syslog.logf(LOG_INFO, "brightness: %d", brightness);
-	  FastLED.setBrightness(brightness);
-	  delay(10);
-	}
-	break;
+        if (packetSize > 1) {
+          unsigned char brightness = udpControl.read();
+          syslog.logf(LOG_INFO, "brightness: %d", brightness);
+          FastLED.setBrightness(brightness);
+          delay(10);
+        }
+        break;
     }
   }
 }
@@ -202,7 +202,6 @@ bool check_server(unsigned long loop_time) {
   return true;
 }
 
-
 void loop() {
   unsigned long now = millis();
 
@@ -217,7 +216,6 @@ void loop() {
   }
 
   if (check_server(now)) {
-
 #ifdef COUNT_FRAMES_TO
     if (0 == (++frame_cnt % COUNT_FRAMES_TO)) {
       syslog.logf(LOG_DEBUG, "%d Frames written to LED", COUNT_FRAMES_TO);
