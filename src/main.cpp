@@ -161,6 +161,7 @@ void check_control() {
           unsigned char brightness = udpControl.read();
           syslog.logf(LOG_INFO, "brightness: %d", brightness);
           FastLED.setBrightness(brightness);
+          FastLED.show();
           delay(10);
         }
         break;
