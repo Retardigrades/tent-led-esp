@@ -232,6 +232,10 @@ void loop() {
 #endif
 
     ts.last_frame = now;
+  } else {
+    if (now - ts.last_frame > (30 * 1000)) {
+      ESP.reset();
+    }
   }
 
   ts.last_packet_check = now;
