@@ -13,7 +13,7 @@
 
 #define BRIGHTNESS 90
 #define STRIPS 5
-#define LED_PER_STRIP 20
+#define LED_PER_STRIP 100
 #define FRAME_RATE 30
 
 #define FIST_PACKET_SIZE 800
