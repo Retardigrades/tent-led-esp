@@ -197,13 +197,14 @@ bool check_server(unsigned long loop_time) {
                       BUFSIZE - read);
           return false;
         }
-        delay(1);
+        yield();
       }
     }
 
     size_t current = udpServer.read(data.buffer + read, BUFSIZE - read);
     packetSize -= current;
     read += current;
+    yield();
   }
 
   FastLED.show();
@@ -233,7 +234,8 @@ void loop() {
 
     ts.last_frame = now;
   } else {
-    if (now - ts.last_frame > (30 * 1000)) {
+    if (now - ts.last_frame > (10 * 1000)) {
+      WiFi.disconnect();
       ESP.reset();
     }
   }
