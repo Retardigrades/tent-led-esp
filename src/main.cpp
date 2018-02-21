@@ -49,38 +49,16 @@ struct {
 
 uint16_t frame_cnt = 0;
 
-void eventWiFi(WiFiEvent_t event) {
-  switch (event) {
-    case WIFI_EVENT_STAMODE_CONNECTED:
-      break;
 
-    case WIFI_EVENT_STAMODE_DISCONNECTED:
-      // Maybe find a better solution for this.
-      ESP.restart();
-      break;
-
-    case WIFI_EVENT_STAMODE_AUTHMODE_CHANGE:
-      break;
-
-    case WIFI_EVENT_STAMODE_GOT_IP:
-      break;
-
-    case WIFI_EVENT_STAMODE_DHCP_TIMEOUT:
-      break;
-
-    case WIFI_EVENT_SOFTAPMODE_STACONNECTED:
-      break;
-
-    case WIFI_EVENT_SOFTAPMODE_STADISCONNECTED:
-      break;
-
-    case WIFI_EVENT_SOFTAPMODE_PROBEREQRECVED:
-      break;
-  }
+void errorHandler() {
+  WiFi.disconnect();
+  delay(10);
+  ESP.restart();
 }
 
+
 void netSetup() {
-  WiFi.onEvent(eventWiFi);
+  WiFi.onStationModeDisconnected([](const WiFiEventStationModeDisconnected&){ errorHandler(); });
   WiFi.persistent(false);
   WiFi.mode(WIFI_STA);
   WiFi.begin(WIFI_SSID, WIFI_PASSWD);
@@ -88,6 +66,7 @@ void netSetup() {
     delay(500);
   }
 }
+
 
 void init_leds() {
   // Set GPIO15 to pullup
@@ -154,7 +133,7 @@ void check_control() {
       case 0x01:
         syslog.log(LOG_CRIT, "Reboot controller");
         delay(50);
-        ESP.restart();
+        errorHandler();
         break;
       case 0x02:
         if (packetSize > 1) {
@@ -169,7 +148,7 @@ void check_control() {
   }
 }
 
-bool check_server(unsigned long loop_time) {
+bool check_server(const unsigned long loop_time) {
   size_t packetSize = udpServer.parsePacket();
   if (0 == packetSize) {
     // delay(3);
@@ -187,9 +166,16 @@ bool check_server(unsigned long loop_time) {
   size_t read = 0;
 
   while (read < BUFSIZE) {
+
+    // Get the remaining packets
     while (packetSize <= 0) {
       packetSize = udpServer.parsePacket();
+
+      // If we did not get a packet
       if (packetSize == 0) {
+
+        // Drop the frame if we dont get a packet for one third
+        // of the frame time.
         if (millis() - loop_time > (FRAME_TIME / 3)) {
           syslog.logf(LOG_DEBUG,
                       "Did not get %d bytes in "
@@ -198,6 +184,18 @@ bool check_server(unsigned long loop_time) {
           return false;
         }
         yield();
+      } else {
+        const size_t expected = std::min(FIST_PACKET_SIZE, BUFSIZE - read);
+
+        // If we run into the next packet
+        if (expected < packetSize) {
+          syslog.logf(LOG_DEBUG,
+                      "Got %d byts, expect less than %d "
+                      "drop frame...",
+                      packetSize, expected
+                      );
+          return false;
+        }
       }
     }
 
@@ -235,8 +233,7 @@ void loop() {
     ts.last_frame = now;
   } else {
     if (now - ts.last_frame > (10 * 1000)) {
-      WiFi.disconnect();
-      ESP.reset();
+      errorHandler();
     }
   }
 
